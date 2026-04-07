@@ -69,3 +69,679 @@
       height: 16px;
       background: #2a2e45;
       border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .fill {
+      height: 100%;
+      transition: width 0.2s ease;
+    }
+
+    .hp { background: #ff4d6d; }
+    .mp { background: #4da3ff; }
+    .boss { background: #ff9f1c; }
+
+    #gameArea {
+      position: relative;
+      width: 100%;
+      height: 320px;
+      background: radial-gradient(circle at center, #1a1d2d, #090a12);
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid #2a2e45;
+      margin: 10px 0;
+    }
+
+    #player {
+      position: absolute;
+      width: 42px;
+      height: 42px;
+      left: 140px;
+      top: 140px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #7cffd7, #3ed6ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 0 18px rgba(62,214,255,.45);
+    }
+
+    #bossSprite {
+      position: absolute;
+      right: 40px;
+      top: 80px;
+      width: 130px;
+      height: 130px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #ff8a00, #ff3d3d);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+      box-shadow: 0 0 20px rgba(255,90,60,.45);
+    }
+
+    #joystickWrap {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    #joystick {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: #1d2030;
+      position: relative;
+      border: 1px solid #2f3450;
+      touch-action: none;
+    }
+
+    #stick {
+      position: absolute;
+      left: 40px;
+      top: 40px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #6c4cff;
+    }
+
+    #log {
+      text-align: left;
+      white-space: pre-line;
+      max-height: 220px;
+      overflow: auto;
+      background: #0f111a;
+      border-radius: 12px;
+      padding: 12px;
+      border: 1px solid #24283b;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 4px 8px;
+      background: #24283b;
+      border-radius: 999px;
+      margin: 2px;
+      font-size: 13px;
+    }
+
+    input {
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #363b59;
+      background: #111320;
+      color: white;
+      width: 220px;
+      max-width: 100%;
+    }
+
+    .monster-card, .fam-card {
+      background: #111320;
+      border: 1px solid #2b3050;
+      border-radius: 14px;
+      padding: 12px;
+      text-align: left;
+    }
+
+    .big {
+      font-size: 40px;
+    }
+
+    .coin {
+      color: #ffd166;
+      font-weight: bold;
+    }
+
+    .subtitle {
+      color: #b8bed8;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div id="opening" class="screen">
+    <div class="panel">
+      <h1>🌀 무한 던전 RPG</h1>
+      <p class="subtitle">룰렛을 돌리던 중, “이세계”가 나왔다. 바닥에 포탈이 열리고, 그대로 추락…</p>
+      <div class="panel" style="background:#0f111a;">
+        <div class="big">🎡 → 🕳️ → 🌌</div>
+        <p>오프닝 스토리</p>
+        <button onclick="startGame()">게임 시작</button>
+      </div>
+      <div class="topbar">
+        <button class="secondary" onclick="openSavePrompt()">저장 불러오기</button>
+        <button class="secondary" onclick="showScreen('room')">방 입장</button>
+        <button class="secondary" onclick="showScreen('settings')">설정</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="room" class="screen hidden">
+    <div class="panel">
+      <h2>🔑 방 입장</h2>
+      <p class="subtitle">관리자 코드는 9595</p>
+      <input id="roomCode" placeholder="코드 입력" />
+      <div style="margin-top:10px;">
+        <button onclick="joinRoom()">입장</button>
+        <button class="secondary" onclick="showScreen('opening')">뒤로</button>
+      </div>
+      <p id="roomInfo" class="subtitle"></p>
+    </div>
+  </div>
+
+  <div id="settings" class="screen hidden">
+    <div class="panel">
+      <h2>⚙️ 설정</h2>
+      <button onclick="toggleSound()">소리 ON/OFF</button>
+      <button onclick="toggleSeason()">계절 바꾸기</button>
+      <button class="secondary" onclick="showScreen('opening')">뒤로</button>
+      <p id="settingsInfo" class="subtitle"></p>
+    </div>
+  </div>
+
+  <div id="game" class="screen hidden">
+    <div class="panel">
+      <div class="topbar">
+        <span class="tag" id="playerRoleTag">플레이어</span>
+        <span class="tag">계절: <span id="seasonText">여름</span></span>
+        <span class="tag">코인: <span class="coin" id="coinText">0</span></span>
+        <span class="tag">사역마: <span id="famText">없음</span></span>
+      </div>
+
+      <div class="bars">
+        <div class="bar-wrap">
+          <div class="bar-label">❤️ 플레이어 HP <span id="hpNum"></span></div>
+          <div class="bar"><div id="hpBar" class="fill hp" style="width:100%"></div></div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar-label">🔷 플레이어 MP <span id="mpNum"></span></div>
+          <div class="bar"><div id="mpBar" class="fill mp" style="width:100%"></div></div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar-label">🦀 보스 HP <span id="bossNum"></span></div>
+          <div class="bar"><div id="bossBar" class="fill boss" style="width:100%"></div></div>
+        </div>
+      </div>
+
+      <div id="gameArea">
+        <div id="player" onclick="openInventory()">🧍</div>
+        <div id="bossSprite">🦀</div>
+      </div>
+
+      <div id="joystickWrap">
+        <div id="joystick">
+          <div id="stick"></div>
+        </div>
+      </div>
+
+      <div class="topbar" style="margin-top:12px;">
+        <button onclick="attack()">⚔️ 공격</button>
+        <button onclick="useSkill()">💥 스킬</button>
+        <button onclick="summonFamiliar()">👾 사역마 소환</button>
+        <button onclick="openDex()">📖 도감</button>
+        <button onclick="openShop()">🛒 상점</button>
+        <button onclick="openChest()">📦 던전 상자</button>
+        <button onclick="openRoulette()">🎡 룰렛</button>
+        <button class="secondary" onclick="saveGame()">💾 저장</button>
+      </div>
+
+      <div class="topbar">
+        <button class="secondary" onclick="spawnLeviathan()">🐋 레비아탄</button>
+        <button class="secondary" onclick="spawnBasilisk()">🐍 바실리스크</button>
+        <button class="danger" onclick="spawnCrabBoss()">🦀 게 최종보스</button>
+      </div>
+
+      <div class="panel">
+        <h3>전투 로그</h3>
+        <div id="log"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="inventory" class="screen hidden">
+    <div class="panel">
+      <h2>🎒 인벤토리 / 제작 / 업그레이드</h2>
+      <p class="subtitle">캐릭터를 누르면 열리는 화면</p>
+      <div class="topbar">
+        <span class="tag">강화석: <span id="stoneCount">0</span></span>
+        <span class="tag">봉인석: <span id="sealCount">0</span></span>
+        <span class="tag">소환석: <span id="summonCount">0</span></span>
+      </div>
+      <div class="topbar">
+        <button onclick="upgradeWeapon()">🔥 무기 업그레이드</button>
+        <button onclick="craftSeal()">🔒 봉인 제작</button>
+        <button onclick="craftSummon()">✨ 소환 제작</button>
+        <button class="secondary" onclick="showScreen('game')">뒤로</button>
+      </div>
+      <div id="inventoryLog" class="panel" style="text-align:left;"></div>
+    </div>
+  </div>
+
+  <div id="dex" class="screen hidden">
+    <div class="panel">
+      <h2>📖 괴물 도감</h2>
+      <div class="grid two">
+        <div class="monster-card">
+          <div class="big">🐋</div>
+          <h3>레비아탄</h3>
+          <p>심해의 지배자. 비늘과 이빨이 중요 재료.</p>
+        </div>
+        <div class="monster-card">
+          <div class="big">🐍</div>
+          <h3>바실리스크</h3>
+          <p>도롱용 합체로만 도달 가능한 상위종.</p>
+        </div>
+        <div class="monster-card">
+          <div class="big">🦀</div>
+          <h3>게 최종보스</h3>
+          <p>겨울에만 진짜 등장. 잡으면 코인을 준다.</p>
+        </div>
+        <div class="monster-card">
+          <div class="big">❓</div>
+          <h3>히든 사역마</h3>
+          <p id="hiddenFamHint">석판에서 얻는 방법이 드러난다.</p>
+        </div>
+      </div>
+      <button class="secondary" onclick="showScreen('game')">뒤로</button>
+    </div>
+  </div>
+
+  <div id="shop" class="screen hidden">
+    <div class="panel">
+      <h2>🛒 상점</h2>
+      <p>게를 잡아 얻은 코인으로 모드를 산다.</p>
+      <div class="topbar">
+        <span class="tag">보유 코인: <span class="coin" id="shopCoinText">0</span></span>
+      </div>
+      <div class="grid two">
+        <div class="monster-card">
+          <h3>모드: 하드</h3>
+          <p>가격: 20 코인</p>
+          <button onclick="buyMode('하드',20)">구매</button>
+        </div>
+        <div class="monster-card">
+          <h3>모드: 보스러시</h3>
+          <p>가격: 35 코인</p>
+          <button onclick="buyMode('보스러시',35)">구매</button>
+        </div>
+      </div>
+      <button class="secondary" onclick="showScreen('game')">뒤로</button>
+    </div>
+  </div>
+
+  <div id="chest" class="screen hidden">
+    <div class="panel">
+      <h2>📦 던전 상자</h2>
+      <p>소환, 봉인, 강화, 히든 힌트가 나온다.</p>
+      <button onclick="openOneChest()">상자 열기</button>
+      <button class="secondary" onclick="showScreen('game')">뒤로</button>
+      <div id="chestLog" class="panel" style="text-align:left;"></div>
+    </div>
+  </div>
+
+  <div id="roulette" class="screen hidden">
+    <div class="panel">
+      <h2>🎡 사역마 룰렛</h2>
+      <p>사역마마다 맞는 룰렛이 있다. 지금은 기본 룰렛.</p>
+      <button onclick="rollFamiliarRoulette()">룰렛 돌리기</button>
+      <button class="secondary" onclick="showScreen('game')">뒤로</button>
+      <div id="rouletteLog" class="panel" style="text-align:left;"></div>
+    </div>
+  </div>
+
+  <script>
+    const SAVE_PASSWORD = "5643";
+    const ADMIN_CODE = "9595";
+
+    let soundOn = true;
+    let season = "여름";
+    let role = "플레이어";
+
+    let hp = 100;
+    let maxHp = 100;
+    let mp = 50;
+    let maxMp = 50;
+    let bossHp = 300;
+    let bossMaxHp = 300;
+    let currentBoss = "게";
+
+    let coins = 0;
+    let power = 12;
+
+    let stones = 0;
+    let seals = 0;
+    let summons = 0;
+
+    let familiar = "없음";
+    let hiddenHintFound = false;
+
+    const familiarList = [
+      "드래곤","악마","정령","늑대","기사",
+      "슬라임","유령","불새","골렘","천사",
+      "요정","암흑기사","바다정령","번개새","서리늑대"
+    ];
+
+    function showScreen(id) {
+      const ids = ["opening","room","settings","game","inventory","dex","shop","chest","roulette"];
+      ids.forEach(x => document.getElementById(x).classList.add("hidden"));
+      document.getElementById(id).classList.remove("hidden");
+      updateUI();
+    }
+
+    function startGame() {
+      showScreen("game");
+      log("🌌 포탈로 떨어졌다. 이세계 생존 시작!");
+    }
+
+    function joinRoom() {
+      const code = document.getElementById("roomCode").value.trim();
+      if (code === ADMIN_CODE) {
+        role = "관리자";
+        document.getElementById("roomInfo").innerText = "관리자 방에 입장했다.";
+      } else {
+        role = "플레이어";
+        document.getElementById("roomInfo").innerText = "일반 플레이어로 입장했다.";
+      }
+      showScreen("game");
+      log(`🔑 ${role}로 입장`);
+    }
+
+    function toggleSound() {
+      soundOn = !soundOn;
+      document.getElementById("settingsInfo").innerText = "소리: " + (soundOn ? "ON" : "OFF");
+    }
+
+    function toggleSeason() {
+      season = season === "여름" ? "겨울" : "여름";
+      document.getElementById("settingsInfo").innerText = "현재 계절: " + season;
+      log("❄️ 계절 변경: " + season);
+      updateUI();
+    }
+
+    function updateUI() {
+      document.getElementById("seasonText").innerText = season;
+      document.getElementById("coinText").innerText = coins;
+      document.getElementById("shopCoinText").innerText = coins;
+      document.getElementById("famText").innerText = familiar;
+      document.getElementById("playerRoleTag").innerText = role;
+
+      document.getElementById("hpNum").innerText = `${Math.max(0, hp)} / ${maxHp}`;
+      document.getElementById("mpNum").innerText = `${Math.max(0, mp)} / ${maxMp}`;
+      document.getElementById("bossNum").innerText = `${Math.max(0, bossHp)} / ${bossMaxHp}`;
+
+      document.getElementById("hpBar").style.width = Math.max(0, hp / maxHp * 100) + "%";
+      document.getElementById("mpBar").style.width = Math.max(0, mp / maxMp * 100) + "%";
+      document.getElementById("bossBar").style.width = Math.max(0, bossHp / bossMaxHp * 100) + "%";
+
+      document.getElementById("stoneCount").innerText = stones;
+      document.getElementById("sealCount").innerText = seals;
+      document.getElementById("summonCount").innerText = summons;
+
+      document.getElementById("hiddenFamHint").innerText =
+        hiddenHintFound ? "석판이 말한다. 겨울 심연 상자에서 ‘고대용’의 흔적을 찾을 수 있다." : "석판에서 얻는 방법이 드러난다.";
+    }
+
+    function log(text) {
+      const el = document.getElementById("log");
+      el.innerText += "\n" + text;
+      el.scrollTop = el.scrollHeight;
+    }
+
+    function resetBoss(type) {
+      currentBoss = type;
+      if (type === "레비아탄") {
+        bossMaxHp = 220;
+      } else if (type === "바실리스크") {
+        bossMaxHp = 260;
+      } else {
+        bossMaxHp = 300;
+      }
+      bossHp = bossMaxHp;
+      document.getElementById("bossSprite").innerText =
+        type === "레비아탄" ? "🐋" :
+        type === "바실리스크" ? "🐍" : "🦀";
+      log(`👁️ ${type} 등장!`);
+      updateUI();
+    }
+
+    function spawnLeviathan() { resetBoss("레비아탄"); }
+    function spawnBasilisk() { resetBoss("바실리스크"); }
+    function spawnCrabBoss() { resetBoss("게"); }
+
+    function attack() {
+      const dmg = rand(10, 20) + power;
+      bossHp -= dmg;
+      log(`⚔️ 공격! ${dmg} 피해`);
+      afterPlayerAction();
+    }
+
+    function useSkill() {
+      if (mp < 10) {
+        log("🔷 MP 부족");
+        return;
+      }
+      mp -= 10;
+      const dmg = power * 3;
+      bossHp -= dmg;
+      log(`💥 스킬 발동! ${dmg} 피해`);
+      afterPlayerAction();
+    }
+
+    function summonFamiliar() {
+      familiar = familiarList[rand(0, familiarList.length - 1)];
+      log(`👾 사역마 소환: ${familiar}`);
+      updateUI();
+    }
+
+    function bossCounter() {
+      const dmg = rand(10, 18);
+      hp -= dmg;
+      log(`${document.getElementById("bossSprite").innerText} 반격! ${dmg} 피해`);
+      if (hp <= 0) {
+        hp = 0;
+        updateUI();
+        alert("게임 오버");
+        location.reload();
+      }
+    }
+
+    function afterPlayerAction() {
+      if (bossHp <= 0) {
+        bossHp = 0;
+        let reward = 5;
+        if (currentBoss === "게" && season === "겨울") reward = 20;
+        if (currentBoss === "레비아탄") reward = 8;
+        if (currentBoss === "바실리스크") reward = 12;
+        coins += reward;
+        log(`🏆 ${currentBoss} 처치! 코인 +${reward}`);
+        resetBoss(currentBoss);
+      } else {
+        bossCounter();
+      }
+      updateUI();
+    }
+
+    function openInventory() {
+      document.getElementById("inventoryLog").innerText =
+        `현재 전투력: ${power}\n강화석: ${stones}\n봉인석: ${seals}\n소환석: ${summons}`;
+      showScreen("inventory");
+    }
+
+    function upgradeWeapon() {
+      if (stones <= 0) {
+        document.getElementById("inventoryLog").innerText += "\n강화석 부족";
+        return;
+      }
+      stones--;
+      power += 3;
+      document.getElementById("inventoryLog").innerText += `\n🔥 강화 성공! 전투력 ${power}`;
+      updateUI();
+    }
+
+    function craftSeal() {
+      if (stones < 1) {
+        document.getElementById("inventoryLog").innerText += "\n재료 부족";
+        return;
+      }
+      stones--;
+      seals++;
+      document.getElementById("inventoryLog").innerText += "\n🔒 봉인 제작 완료";
+      updateUI();
+    }
+
+    function craftSummon() {
+      if (stones < 1) {
+        document.getElementById("inventoryLog").innerText += "\n재료 부족";
+        return;
+      }
+      stones--;
+      summons++;
+      document.getElementById("inventoryLog").innerText += "\n✨ 소환 제작 완료";
+      updateUI();
+    }
+
+    function openDex() { showScreen("dex"); }
+    function openShop() { showScreen("shop"); }
+    function openChest() { showScreen("chest"); }
+    function openRoulette() { showScreen("roulette"); }
+
+    function buyMode(name, price) {
+      if (coins < price) {
+        alert("코인이 부족해");
+        return;
+      }
+      coins -= price;
+      log(`🛒 ${name} 모드 구매 완료`);
+      updateUI();
+    }
+
+    function openOneChest() {
+      const rewards = ["소환석", "봉인석", "강화석", "히든 힌트"];
+      const pick = rewards[rand(0, rewards.length - 1)];
+      const el = document.getElementById("chestLog");
+
+      if (pick === "소환석") summons++;
+      if (pick === "봉인석") seals++;
+      if (pick === "강화석") stones++;
+      if (pick === "히든 힌트") hiddenHintFound = true;
+
+      el.innerText += "\n📦 상자 결과: " + pick;
+      updateUI();
+    }
+
+    function rollFamiliarRoulette() {
+      const list = ["드래곤","악마","정령","고릴라","도롱용","슬라임","유령"];
+      const pick = list[rand(0, list.length - 1)];
+      familiar = pick;
+      document.getElementById("rouletteLog").innerText += "\n🎡 룰렛 결과: " + pick;
+      updateUI();
+    }
+
+    function openSavePrompt() {
+      const pw = prompt("저장 비밀번호 입력");
+      if (pw !== SAVE_PASSWORD) {
+        alert("비밀번호가 틀렸어");
+        return;
+      }
+      loadGame();
+    }
+
+    function saveGame() {
+      const pw = prompt("저장 비밀번호 입력");
+      if (pw !== SAVE_PASSWORD) {
+        alert("비밀번호가 틀렸어");
+        return;
+      }
+      const data = {
+        hp, maxHp, mp, maxMp,
+        bossHp, bossMaxHp, currentBoss,
+        coins, power, stones, seals, summons,
+        familiar, season, role, hiddenHintFound
+      };
+      localStorage.setItem("rouletteDungeonSave", JSON.stringify(data));
+      alert("저장 완료");
+    }
+
+    function loadGame() {
+      const raw = localStorage.getItem("rouletteDungeonSave");
+      if (!raw) {
+        alert("저장 데이터가 없어");
+        return;
+      }
+      const d = JSON.parse(raw);
+      hp = d.hp; maxHp = d.maxHp;
+      mp = d.mp; maxMp = d.maxMp;
+      bossHp = d.bossHp; bossMaxHp = d.bossMaxHp; currentBoss = d.currentBoss;
+      coins = d.coins; power = d.power;
+      stones = d.stones; seals = d.seals; summons = d.summons;
+      familiar = d.familiar; season = d.season; role = d.role;
+      hiddenHintFound = d.hiddenHintFound;
+      document.getElementById("bossSprite").innerText =
+        currentBoss === "레비아탄" ? "🐋" :
+        currentBoss === "바실리스크" ? "🐍" : "🦀";
+      showScreen("game");
+      updateUI();
+      log("💾 저장 불러오기 완료");
+    }
+
+    function rand(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // 조이스틱
+    const joystick = document.getElementById("joystick");
+    const stick = document.getElementById("stick");
+    const player = document.getElementById("player");
+    let dragging = false;
+
+    joystick.addEventListener("pointerdown", () => dragging = true);
+    window.addEventListener("pointerup", () => {
+      dragging = false;
+      stick.style.left = "40px";
+      stick.style.top = "40px";
+    });
+
+    joystick.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      const rect = joystick.getBoundingClientRect();
+      let x = e.clientX - rect.left - 20;
+      let y = e.clientY - rect.top - 20;
+      x = Math.max(10, Math.min(70, x));
+      y = Math.max(10, Math.min(70, y));
+      stick.style.left = x + "px";
+      stick.style.top = y + "px";
+
+      const area = document.getElementById("gameArea").getBoundingClientRect();
+      const px = parseFloat(player.style.left || 140);
+      const py = parseFloat(player.style.top || 140);
+
+      let dx = (x - 40) / 12;
+      let dy = (y - 40) / 12;
+
+      let nx = Math.max(0, Math.min(area.width - 42, px + dx));
+      let ny = Math.max(0, Math.min(area.height - 42, py + dy));
+
+      player.style.left = nx + "px";
+      player.style.top = ny + "px";
+    });
+
+    // 시작값
+    resetBoss("게");
+    updateUI();
+    log("🎮 준비 완료");
+  </script>
+</body>
+</html>
