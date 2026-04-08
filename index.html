@@ -3,745 +3,1188 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>무한 던전 RPG</title>
+  <title>Infinite Abyss Survival</title>
   <style>
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: #0b0b12;
-      color: #f3f3f3;
-      font-family: sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at top, #24315b 0%, #10162c 45%, #04070f 100%);
+      color: #fff;
       text-align: center;
     }
-    h1, h2, h3, p { margin: 8px 0; }
-    button {
-      margin: 4px;
-      padding: 10px 14px;
-      border: none;
-      border-radius: 10px;
-      background: #6c4cff;
-      color: white;
-      font-size: 15px;
-    }
-    button.secondary { background: #2f3142; }
-    button.danger { background: #d34b4b; }
-    .hidden { display: none; }
-
-    .screen {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 16px;
-    }
-
+    .hidden { display: none !important; }
+    .screen { max-width: 1100px; margin: 0 auto; padding: 16px; }
     .panel {
-      background: #171926;
-      border: 1px solid #2a2e45;
-      border-radius: 16px;
+      background: rgba(18, 25, 51, 0.92);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 18px;
       padding: 14px;
       margin: 10px 0;
+      box-shadow: 0 12px 28px rgba(0,0,0,.28);
     }
-
-    .topbar {
+    .title {
+      font-size: 34px;
+      font-weight: 900;
+      margin: 6px 0;
+      text-shadow: 0 0 20px rgba(122,0,255,.35);
+    }
+    .sub { color: #c8cff6; font-size: 14px; }
+    .row {
       display: flex;
-      gap: 8px;
       flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .bars {
-      display: grid;
       gap: 8px;
-      margin: 10px 0;
-    }
-
-    .bar-wrap {
-      text-align: left;
-    }
-
-    .bar-label {
-      font-size: 14px;
-      margin-bottom: 4px;
-    }
-
-    .bar {
-      width: 100%;
-      height: 16px;
-      background: #2a2e45;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .fill {
-      height: 100%;
-      transition: width 0.2s ease;
-    }
-
-    .hp { background: #ff4d6d; }
-    .mp { background: #4da3ff; }
-    .boss { background: #ff9f1c; }
-
-    #gameArea {
-      position: relative;
-      width: 100%;
-      height: 320px;
-      background: radial-gradient(circle at center, #1a1d2d, #090a12);
-      border-radius: 18px;
-      overflow: hidden;
-      border: 1px solid #2a2e45;
-      margin: 10px 0;
-    }
-
-    #player {
-      position: absolute;
-      width: 42px;
-      height: 42px;
-      left: 140px;
-      top: 140px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #7cffd7, #3ed6ff);
-      display: flex;
+      justify-content: center;
       align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      box-shadow: 0 0 18px rgba(62,214,255,.45);
     }
-
-    #bossSprite {
-      position: absolute;
-      right: 40px;
-      top: 80px;
-      width: 130px;
-      height: 130px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, #ff8a00, #ff3d3d);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 64px;
-      box-shadow: 0 0 20px rgba(255,90,60,.45);
-    }
-
-    #joystickWrap {
-      display: flex;
-      justify-content: center;
-      margin-top: 10px;
-    }
-
-    #joystick {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      background: #1d2030;
-      position: relative;
-      border: 1px solid #2f3450;
-      touch-action: none;
-    }
-
-    #stick {
-      position: absolute;
-      left: 40px;
-      top: 40px;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #6c4cff;
-    }
-
-    #log {
-      text-align: left;
-      white-space: pre-line;
-      max-height: 220px;
-      overflow: auto;
-      background: #0f111a;
-      border-radius: 12px;
-      padding: 12px;
-      border: 1px solid #24283b;
-      font-size: 14px;
-    }
-
     .grid {
       display: grid;
-      gap: 10px;
+      gap: 12px;
     }
+    .grid.two { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+    .grid.three { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 
-    .grid.two {
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    button, input {
+      border: none;
+      border-radius: 14px;
+      padding: 11px 14px;
+      font-size: 15px;
+    }
+    button {
+      background: linear-gradient(135deg, #7a00ff, #4ea5ff);
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    button.secondary { background: linear-gradient(135deg, #2e365d, #1c2342); }
+    button.green { background: linear-gradient(135deg, #14b678, #0f8f5d); }
+    button.gold { background: linear-gradient(135deg, #e4af35, #bb7417); }
+    button.red { background: linear-gradient(135deg, #db5268, #ab263f); }
+    input {
+      background: #0d1221;
+      color: white;
+      border: 1px solid rgba(255,255,255,.12);
+      min-width: 220px;
     }
 
     .tag {
       display: inline-block;
-      padding: 4px 8px;
-      background: #24283b;
+      padding: 5px 10px;
       border-radius: 999px;
-      margin: 2px;
+      background: rgba(255,255,255,.08);
       font-size: 13px;
+      margin: 2px;
     }
 
-    input {
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid #363b59;
-      background: #111320;
-      color: white;
-      width: 220px;
-      max-width: 100%;
+    .bars { display: grid; gap: 8px; text-align: left; }
+    .bar-label { font-size: 13px; color: #d7ddff; margin-bottom: 4px; }
+    .bar {
+      width: 100%;
+      height: 16px;
+      background: #2b3258;
+      border-radius: 999px;
+      overflow: hidden;
     }
+    .fill { height: 100%; transition: width .25s ease; }
+    .hp { background: linear-gradient(90deg, #ff5d73, #ff9b64); }
+    .mp { background: linear-gradient(90deg, #4da3ff, #56e0ff); }
+    .boss { background: linear-gradient(90deg, #73ff6a, #12d7a7); }
+    .hunger { background: linear-gradient(90deg, #ffb84d, #ff7b00); }
+    .thirst { background: linear-gradient(90deg, #6cc7ff, #22a2ff); }
+    .xp { background: linear-gradient(90deg, #aa68ff, #5f8fff); }
 
-    .monster-card, .fam-card {
-      background: #111320;
-      border: 1px solid #2b3050;
-      border-radius: 14px;
+    .card {
+      background: #11172b;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px;
       padding: 12px;
       text-align: left;
     }
-
-    .big {
-      font-size: 40px;
+    .portrait {
+      width: 96px;
+      height: 96px;
+      border-radius: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 52px;
+      margin: 0 auto 10px;
+      background: linear-gradient(135deg, #6f5bff, #3faeff);
+      cursor: pointer;
     }
 
-    .coin {
-      color: #ffd166;
-      font-weight: bold;
+    #worldArea {
+      position: relative;
+      width: 100%;
+      height: 360px;
+      overflow: hidden;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.1);
+      background:
+        radial-gradient(circle at 50% 20%, rgba(120,160,255,.16), transparent 22%),
+        radial-gradient(circle at 15% 80%, rgba(34,227,172,.14), transparent 18%),
+        radial-gradient(circle at 85% 18%, rgba(255,183,77,.12), transparent 18%),
+        linear-gradient(180deg, #1d2547, #101529 55%, #090d1a 100%);
+    }
+    .entity {
+      position: absolute;
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 42px;
+      user-select: none;
+      box-shadow: 0 12px 24px rgba(0,0,0,.25);
+    }
+    #player {
+      left: 70px;
+      top: 160px;
+      background: linear-gradient(135deg, #7cffd7, #43c6ff);
+      box-shadow: 0 0 22px rgba(67,198,255,.35);
+      z-index: 3;
+    }
+    #bossSprite {
+      right: 70px;
+      top: 120px;
+      width: 110px;
+      height: 110px;
+      font-size: 62px;
+      background: linear-gradient(135deg, #ff9e57, #ff4f67);
     }
 
-    .subtitle {
-      color: #b8bed8;
-      font-size: 14px;
+    #log, #inventoryLog, #rankingList, #codeHintLog {
+      background: rgba(6,10,24,.85);
+      border-radius: 14px;
+      padding: 12px;
+      min-height: 160px;
+      max-height: 260px;
+      overflow: auto;
+      text-align: left;
+      white-space: pre-line;
+      border: 1px solid rgba(255,255,255,.06);
+    }
+
+    #callUi {
+      position: fixed;
+      right: 10px;
+      bottom: 10px;
+      width: 190px;
+      background: rgba(17,26,51,.96);
+      border: 1px solid #334;
+      border-radius: 14px;
+      padding: 10px;
+      z-index: 20;
+    }
+    .videoBox {
+      height: 100px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #1c2544, #273a6a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 42px;
+      margin-bottom: 8px;
+    }
+
+    .small { font-size: 12px; color: #ccd5ff; }
+    .shake { animation: shake .28s; }
+    .flash { animation: flash .35s 3; }
+    .pulse { animation: pulse 1.2s infinite; }
+    @keyframes shake {
+      0%{transform:translate(0)}
+      25%{transform:translate(6px)}
+      50%{transform:translate(-6px)}
+      75%{transform:translate(6px)}
+      100%{transform:translate(0)}
+    }
+    @keyframes flash {
+      0%{background:#861d2f}
+      100%{background:radial-gradient(circle at top, #24315b 0%, #10162c 45%, #04070f 100%)}
+    }
+    @keyframes pulse {
+      0%{opacity:1}
+      50%{opacity:.45}
+      100%{opacity:1}
     }
   </style>
 </head>
 <body>
   <div id="opening" class="screen">
     <div class="panel">
-      <h1>🌀 무한 던전 RPG</h1>
-      <p class="subtitle">룰렛을 돌리던 중, “이세계”가 나왔다. 바닥에 포탈이 열리고, 그대로 추락…</p>
-      <div class="panel" style="background:#0f111a;">
-        <div class="big">🎡 → 🕳️ → 🌌</div>
-        <p>오프닝 스토리</p>
-        <button onclick="startGame()">게임 시작</button>
-      </div>
-      <div class="topbar">
-        <button class="secondary" onclick="openSavePrompt()">저장 불러오기</button>
-        <button class="secondary" onclick="showScreen('room')">방 입장</button>
-        <button class="secondary" onclick="showScreen('settings')">설정</button>
-      </div>
+      <div class="title">Infinite Abyss Survival</div>
+      <div class="sub">룰렛을 너무 세게 돌렸다. 이세계가 나왔다. 포탈이 열렸다. 떨어졌다.</div>
+      <div style="font-size:68px;margin:8px 0;">🎰</div>
+      <p id="storyText">룰렛을 돌린다...</p>
+      <button onclick="startOpening()">▶ PLAY</button>
     </div>
   </div>
 
-  <div id="room" class="screen hidden">
+  <div id="charSelect" class="screen hidden">
     <div class="panel">
-      <h2>🔑 방 입장</h2>
-      <p class="subtitle">관리자 코드는 9595</p>
-      <input id="roomCode" placeholder="코드 입력" />
-      <div style="margin-top:10px;">
-        <button onclick="joinRoom()">입장</button>
-        <button class="secondary" onclick="showScreen('opening')">뒤로</button>
+      <div class="title">캐릭터 선택</div>
+      <div class="grid three">
+        <div class="card" style="text-align:center">
+          <div style="font-size:48px">🧍</div>
+          <h3>인간</h3>
+          <button onclick="selectChar('🧍','인간')">선택</button>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:48px">🧝</div>
+          <h3>엘프</h3>
+          <button onclick="selectChar('🧝','엘프')">선택</button>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:48px">🐍</div>
+          <h3>바실리스크</h3>
+          <button onclick="selectChar('🐍','바실리스크')">선택</button>
+        </div>
       </div>
-      <p id="roomInfo" class="subtitle"></p>
-    </div>
-  </div>
-
-  <div id="settings" class="screen hidden">
-    <div class="panel">
-      <h2>⚙️ 설정</h2>
-      <button onclick="toggleSound()">소리 ON/OFF</button>
-      <button onclick="toggleSeason()">계절 바꾸기</button>
-      <button class="secondary" onclick="showScreen('opening')">뒤로</button>
-      <p id="settingsInfo" class="subtitle"></p>
     </div>
   </div>
 
   <div id="game" class="screen hidden">
-    <div class="panel">
-      <div class="topbar">
-        <span class="tag" id="playerRoleTag">플레이어</span>
-        <span class="tag">계절: <span id="seasonText">여름</span></span>
-        <span class="tag">코인: <span class="coin" id="coinText">0</span></span>
-        <span class="tag">사역마: <span id="famText">없음</span></span>
+    <div class="grid two">
+      <div class="panel">
+        <div id="portrait" class="portrait" onclick="showScreen('inventory')">🧍</div>
+        <h3 id="charName">인간</h3>
+        <div class="row">
+          <span class="tag">세대 <span id="generationText">1</span></span>
+          <span class="tag">랭크 <span id="rankText">F</span></span>
+          <span class="tag">레벨 <span id="levelText">1</span></span>
+        </div>
+        <div class="row">
+          <span class="tag">세계 <span id="worldText">이세계</span></span>
+          <span class="tag">지역 <span id="locationText">숲</span></span>
+          <span class="tag">계절 <span id="seasonText">겨울 / 밤</span></span>
+        </div>
+        <div class="row">
+          <span class="tag">열매 <span id="fruitText">없음</span></span>
+          <span class="tag">사역마 <span id="famText">없음</span></span>
+          <span class="tag">파티 <span id="partyText">0</span></span>
+        </div>
+        <div class="row">
+          <span class="tag">골드 <span id="goldText">200</span></span>
+          <span class="tag">무기 <span id="weaponText">1</span></span>
+          <span class="tag">티켓 <span id="ticketText">3</span></span>
+          <span class="tag">비행선 <span id="airshipText">0</span></span>
+        </div>
+        <div class="row">
+          <span class="tag">공격력 <span id="atkText">10</span></span>
+          <span class="tag">방어력 <span id="defText">5</span></span>
+          <span class="tag">최대HP <span id="maxHpText">100</span></span>
+        </div>
       </div>
 
-      <div class="bars">
-        <div class="bar-wrap">
-          <div class="bar-label">❤️ 플레이어 HP <span id="hpNum"></span></div>
+      <div class="panel bars">
+        <div>
+          <div class="bar-label">❤️ HP <span id="hpLabel">100 / 100</span></div>
           <div class="bar"><div id="hpBar" class="fill hp" style="width:100%"></div></div>
         </div>
-        <div class="bar-wrap">
-          <div class="bar-label">🔷 플레이어 MP <span id="mpNum"></span></div>
+        <div>
+          <div class="bar-label">🔷 MP <span id="mpLabel">50 / 50</span></div>
           <div class="bar"><div id="mpBar" class="fill mp" style="width:100%"></div></div>
         </div>
-        <div class="bar-wrap">
-          <div class="bar-label">🦀 보스 HP <span id="bossNum"></span></div>
+        <div>
+          <div class="bar-label">🍗 배고픔 <span id="hungerLabel">100 / 100</span></div>
+          <div class="bar"><div id="hungerBar" class="fill hunger" style="width:100%"></div></div>
+        </div>
+        <div>
+          <div class="bar-label">💧 수분 <span id="thirstLabel">100 / 100</span></div>
+          <div class="bar"><div id="thirstBar" class="fill thirst" style="width:100%"></div></div>
+        </div>
+        <div>
+          <div class="bar-label">✨ 경험치 <span id="expLabel">0 / 100</span></div>
+          <div class="bar"><div id="expBar" class="fill xp" style="width:0%"></div></div>
+        </div>
+        <div>
+          <div class="bar-label">👹 보스 HP <span id="bossLabel">100 / 100</span></div>
           <div class="bar"><div id="bossBar" class="fill boss" style="width:100%"></div></div>
         </div>
       </div>
+    </div>
 
-      <div id="gameArea">
-        <div id="player" onclick="openInventory()">🧍</div>
-        <div id="bossSprite">🦀</div>
-      </div>
+    <div id="worldArea" class="panel">
+      <div id="player" class="entity">🧍</div>
+      <div id="bossSprite" class="entity">👹</div>
+    </div>
 
-      <div id="joystickWrap">
-        <div id="joystick">
-          <div id="stick"></div>
-        </div>
-      </div>
-
-      <div class="topbar" style="margin-top:12px;">
+    <div class="panel">
+      <div class="row">
+        <button onclick="explore()">🌍 탐험</button>
         <button onclick="attack()">⚔️ 공격</button>
-        <button onclick="useSkill()">💥 스킬</button>
-        <button onclick="summonFamiliar()">👾 사역마 소환</button>
-        <button onclick="openDex()">📖 도감</button>
+        <button onclick="skill()">💥 스킬</button>
+        <button onclick="dodge()">💨 회피</button>
+        <button class="green" onclick="usePotion()">🧪 포션</button>
+        <button class="gold" onclick="roulette()">🎰 룰렛</button>
         <button onclick="openShop()">🛒 상점</button>
-        <button onclick="openChest()">📦 던전 상자</button>
-        <button onclick="openRoulette()">🎡 룰렛</button>
-        <button class="secondary" onclick="saveGame()">💾 저장</button>
       </div>
+      <div class="row">
+        <button onclick="spawnBoss()">👑 보스</button>
+        <button onclick="openBossChest()">👑 보스 상자</button>
+        <button onclick="showScreen('codePanel')">🔐 코드 입력</button>
+        <button onclick="nightTreasure()">🌙 밤 보물찾기</button>
+        <button onclick="upgradeAirship()">🛩️ 비행선 업뎃</button>
+      </div>
+      <div class="row">
+        <button onclick="upgradeFamiliar()">👾 사역마 강화</button>
+        <button onclick="evolveFamiliar()">✨ 사역마 진화</button>
+        <button onclick="recruitMember()">👥 파티 영입</button>
+        <button onclick="flyAirship()">🛩️ 비행선 탑승</button>
+        <button onclick="openGuild()">🏰 길드</button>
+        <button onclick="coopMode()">🤝 협동</button>
+      </div>
+    </div>
 
-      <div class="topbar">
-        <button class="secondary" onclick="spawnLeviathan()">🐋 레비아탄</button>
-        <button class="secondary" onclick="spawnBasilisk()">🐍 바실리스크</button>
-        <button class="danger" onclick="spawnCrabBoss()">🦀 게 최종보스</button>
+    <div class="panel">
+      <div class="row">
+        <button onclick="spawnFinal()">👑 아비스 게</button>
+        <button onclick="spawnUltraBoss(1)">☠️ 보스1</button>
+        <button onclick="spawnUltraBoss(2)">🌌 보스2</button>
+        <button onclick="spawnUltraBoss(3)">🕳️ 보스3</button>
+        <button onclick="spawnUltraBoss(4)">⚡ 보스4</button>
+        <button onclick="spawnUltraBoss(5)">🩸 보스5</button>
       </div>
+      <div class="row">
+        <button onclick="spawnBasilisk()">🐍 바실리스크</button>
+        <button onclick="shiftBasilisk()">🌀 바실 차원이동</button>
+        <button class="gold" onclick="startWinterEvent()">❄️ 겨울 이벤트</button>
+        <button onclick="toggleWorld()">🌀 세계 이동</button>
+      </div>
+      <div class="row">
+        <button class="secondary" onclick="toggleCallUi()">📞 통화 UI</button>
+        <button class="secondary" onclick="connectFriend()">👤 친구 연결</button>
+        <button class="secondary" onclick="toggleMic()">🎤 마이크</button>
+        <button class="secondary" onclick="saveGameNow()">💾 저장</button>
+      </div>
+    </div>
 
-      <div class="panel">
-        <h3>전투 로그</h3>
-        <div id="log"></div>
-      </div>
+    <div class="panel">
+      <h3>전투 로그</h3>
+      <div id="log"></div>
     </div>
   </div>
 
   <div id="inventory" class="screen hidden">
     <div class="panel">
-      <h2>🎒 인벤토리 / 제작 / 업그레이드</h2>
-      <p class="subtitle">캐릭터를 누르면 열리는 화면</p>
-      <div class="topbar">
-        <span class="tag">강화석: <span id="stoneCount">0</span></span>
-        <span class="tag">봉인석: <span id="sealCount">0</span></span>
-        <span class="tag">소환석: <span id="summonCount">0</span></span>
-      </div>
-      <div class="topbar">
-        <button onclick="upgradeWeapon()">🔥 무기 업그레이드</button>
-        <button onclick="craftSeal()">🔒 봉인 제작</button>
-        <button onclick="craftSummon()">✨ 소환 제작</button>
+      <div class="title">인벤토리 / 상태</div>
+      <div id="inventoryLog"></div>
+      <button class="secondary" onclick="showScreen('game')">뒤로</button>
+    </div>
+  </div>
+
+  <div id="codePanel" class="screen hidden">
+    <div class="panel">
+      <div class="title">🔐 코드 입력판</div>
+      <p class="small">보스 상자에서 나온 코드나 히든 단서를 입력해.</p>
+      <div class="row">
+        <input id="secretCodeInput" placeholder="코드 입력">
+        <button onclick="redeemCode(document.getElementById('secretCodeInput').value)">확인</button>
         <button class="secondary" onclick="showScreen('game')">뒤로</button>
       </div>
-      <div id="inventoryLog" class="panel" style="text-align:left;"></div>
+      <div id="codeHintLog"></div>
     </div>
   </div>
 
-  <div id="dex" class="screen hidden">
+  <div id="ranking" class="screen hidden">
     <div class="panel">
-      <h2>📖 괴물 도감</h2>
-      <div class="grid two">
-        <div class="monster-card">
-          <div class="big">🐋</div>
-          <h3>레비아탄</h3>
-          <p>심해의 지배자. 비늘과 이빨이 중요 재료.</p>
-        </div>
-        <div class="monster-card">
-          <div class="big">🐍</div>
-          <h3>바실리스크</h3>
-          <p>도롱용 합체로만 도달 가능한 상위종.</p>
-        </div>
-        <div class="monster-card">
-          <div class="big">🦀</div>
-          <h3>게 최종보스</h3>
-          <p>겨울에만 진짜 등장. 잡으면 코인을 준다.</p>
-        </div>
-        <div class="monster-card">
-          <div class="big">❓</div>
-          <h3>히든 사역마</h3>
-          <p id="hiddenFamHint">석판에서 얻는 방법이 드러난다.</p>
-        </div>
-      </div>
-      <button class="secondary" onclick="showScreen('game')">뒤로</button>
+      <div class="title">🏆 랭킹</div>
+      <div id="rankingList"></div>
+      <button class="secondary" onclick="showScreen('opening')">뒤로</button>
     </div>
   </div>
 
-  <div id="shop" class="screen hidden">
-    <div class="panel">
-      <h2>🛒 상점</h2>
-      <p>게를 잡아 얻은 코인으로 모드를 산다.</p>
-      <div class="topbar">
-        <span class="tag">보유 코인: <span class="coin" id="shopCoinText">0</span></span>
-      </div>
-      <div class="grid two">
-        <div class="monster-card">
-          <h3>모드: 하드</h3>
-          <p>가격: 20 코인</p>
-          <button onclick="buyMode('하드',20)">구매</button>
-        </div>
-        <div class="monster-card">
-          <h3>모드: 보스러시</h3>
-          <p>가격: 35 코인</p>
-          <button onclick="buyMode('보스러시',35)">구매</button>
-        </div>
-      </div>
-      <button class="secondary" onclick="showScreen('game')">뒤로</button>
-    </div>
-  </div>
-
-  <div id="chest" class="screen hidden">
-    <div class="panel">
-      <h2>📦 던전 상자</h2>
-      <p>소환, 봉인, 강화, 히든 힌트가 나온다.</p>
-      <button onclick="openOneChest()">상자 열기</button>
-      <button class="secondary" onclick="showScreen('game')">뒤로</button>
-      <div id="chestLog" class="panel" style="text-align:left;"></div>
-    </div>
-  </div>
-
-  <div id="roulette" class="screen hidden">
-    <div class="panel">
-      <h2>🎡 사역마 룰렛</h2>
-      <p>사역마마다 맞는 룰렛이 있다. 지금은 기본 룰렛.</p>
-      <button onclick="rollFamiliarRoulette()">룰렛 돌리기</button>
-      <button class="secondary" onclick="showScreen('game')">뒤로</button>
-      <div id="rouletteLog" class="panel" style="text-align:left;"></div>
+  <div id="callUi" class="hidden">
+    <div class="videoBox" id="videoFace">🙂</div>
+    <div><b id="friendName">친구 대기중</b></div>
+    <div class="small" id="callStatus">통화 연결 안 됨</div>
+    <div class="small pulse" id="netStatus">● 대기</div>
+    <div class="row" style="margin-top:8px;">
+      <button onclick="toggleMic()">🎤</button>
+      <button onclick="endCall()">📴</button>
     </div>
   </div>
 
   <script>
-    const SAVE_PASSWORD = "5643";
-    const ADMIN_CODE = "9595";
-
-    let soundOn = true;
-    let season = "여름";
-    let role = "플레이어";
+    // 기본
+    let charIcon = '🧍';
+    let charName = '인간';
 
     let hp = 100;
     let maxHp = 100;
     let mp = 50;
     let maxMp = 50;
-    let bossHp = 300;
-    let bossMaxHp = 300;
-    let currentBoss = "게";
+    let hunger = 100;
+    let thirst = 100;
 
-    let coins = 0;
-    let power = 12;
+    let boss = 100;
+    let maxBoss = 100;
+    let currentBossName = '일반 적';
 
-    let stones = 0;
-    let seals = 0;
-    let summons = 0;
+    let gold = 200;
+    let weaponLevel = 1;
+    let rouletteTicket = 3;
 
-    let familiar = "없음";
-    let hiddenHintFound = false;
+    let fam = '없음';
+    let familiarLevel = 1;
+    let party = [];
 
-    const familiarList = [
-      "드래곤","악마","정령","늑대","기사",
-      "슬라임","유령","불새","골렘","천사",
-      "요정","암흑기사","바다정령","번개새","서리늑대"
+    let airshipLevel = 0;
+    let currentLocation = '숲';
+    let locations = ['숲','사막','화산','빙하','엘바프'];
+
+    let level = 1;
+    let exp = 0;
+    let maxExp = 100;
+
+    let attackPower = 10;
+    let defense = 5;
+
+    let rankScore = 0;
+    let generation = 1;
+    let legacyBonus = 0;
+    let world = '이세계';
+
+    let season = '겨울';
+    let timeOfDay = '밤';
+
+    let bossChestCodes = [];
+    let hiddenClues = [];
+    let hiddenFamiliars = [];
+
+    let winterEventActive = false;
+    let winterGuardianTurn = 0;
+    let devilFruitClaimed = false;
+    let currentFruit = '없음';
+
+    let finalMode = false;
+    let ultraMode = 0;
+    let basiliskMode = false;
+    let basiliskForm = 0;
+    let phase = 1;
+    let micOn = true;
+
+    const defeatedBosses = new Set();
+
+    const ranks = ['F','E','D','C','B','A','S','SS','SSS','SSSS','SSSSS+++++++','∞'];
+    const ultraBosses = {
+      1: { name:'멸계룡 아포칼립스', hp:900, icon:'🐲' },
+      2: { name:'공허군주 네뷸라', hp:1200, icon:'🌌' },
+      3: { name:'심연식왕 오블리비언', hp:1500, icon:'🕳️' },
+      4: { name:'천벌기신 볼트라', hp:1800, icon:'⚡' },
+      5: { name:'종말포식자 크로노블러드', hp:2500, icon:'🩸' }
+    };
+    const basiliskForms = [
+      { name:'인간형 바실리스크', hp:700, icon:'🧛' },
+      { name:'용인형 바실리스크', hp:1000, icon:'🐲' },
+      { name:'거대 3D 뱀 바실리스크', hp:1600, icon:'🐍' }
+    ];
+    const callNames = ['루크친구','용사1','기사K','바실팬','게헌터'];
+    const callFaces = ['🙂','😎','🤖','👦','👧'];
+
+    const shopItems = [
+      {name:'🧪 포션', price:20, type:'heal'},
+      {name:'🍖 음식', price:15, type:'food'},
+      {name:'⚔️ 무기 강화', price:50, type:'weapon'},
+      {name:'👾 사역마 조각', price:40, type:'pet'},
+      {name:'🛩️ 비행선 부품', price:60, type:'airship'},
+      {name:'🎰 룰렛 티켓', price:30, type:'ticket'},
+      {name:'👥 파티 영입권', price:80, type:'party'},
+      {name:'👾 사역마 강화', price:60, type:'fup'}
     ];
 
-    function showScreen(id) {
-      const ids = ["opening","room","settings","game","inventory","dex","shop","chest","roulette"];
-      ids.forEach(x => document.getElementById(x).classList.add("hidden"));
-      document.getElementById(id).classList.remove("hidden");
-      updateUI();
-    }
-
-    function startGame() {
-      showScreen("game");
-      log("🌌 포탈로 떨어졌다. 이세계 생존 시작!");
-    }
-
-    function joinRoom() {
-      const code = document.getElementById("roomCode").value.trim();
-      if (code === ADMIN_CODE) {
-        role = "관리자";
-        document.getElementById("roomInfo").innerText = "관리자 방에 입장했다.";
-      } else {
-        role = "플레이어";
-        document.getElementById("roomInfo").innerText = "일반 플레이어로 입장했다.";
-      }
-      showScreen("game");
-      log(`🔑 ${role}로 입장`);
-    }
-
-    function toggleSound() {
-      soundOn = !soundOn;
-      document.getElementById("settingsInfo").innerText = "소리: " + (soundOn ? "ON" : "OFF");
-    }
-
-    function toggleSeason() {
-      season = season === "여름" ? "겨울" : "여름";
-      document.getElementById("settingsInfo").innerText = "현재 계절: " + season;
-      log("❄️ 계절 변경: " + season);
-      updateUI();
-    }
-
-    function updateUI() {
-      document.getElementById("seasonText").innerText = season;
-      document.getElementById("coinText").innerText = coins;
-      document.getElementById("shopCoinText").innerText = coins;
-      document.getElementById("famText").innerText = familiar;
-      document.getElementById("playerRoleTag").innerText = role;
-
-      document.getElementById("hpNum").innerText = `${Math.max(0, hp)} / ${maxHp}`;
-      document.getElementById("mpNum").innerText = `${Math.max(0, mp)} / ${maxMp}`;
-      document.getElementById("bossNum").innerText = `${Math.max(0, bossHp)} / ${bossMaxHp}`;
-
-      document.getElementById("hpBar").style.width = Math.max(0, hp / maxHp * 100) + "%";
-      document.getElementById("mpBar").style.width = Math.max(0, mp / maxMp * 100) + "%";
-      document.getElementById("bossBar").style.width = Math.max(0, bossHp / bossMaxHp * 100) + "%";
-
-      document.getElementById("stoneCount").innerText = stones;
-      document.getElementById("sealCount").innerText = seals;
-      document.getElementById("summonCount").innerText = summons;
-
-      document.getElementById("hiddenFamHint").innerText =
-        hiddenHintFound ? "석판이 말한다. 겨울 심연 상자에서 ‘고대용’의 흔적을 찾을 수 있다." : "석판에서 얻는 방법이 드러난다.";
-    }
-
-    function log(text) {
-      const el = document.getElementById("log");
-      el.innerText += "\n" + text;
+    function log(t){
+      const el = document.getElementById('log');
+      el.innerText += '\n' + t;
       el.scrollTop = el.scrollHeight;
     }
 
-    function resetBoss(type) {
-      currentBoss = type;
-      if (type === "레비아탄") {
-        bossMaxHp = 220;
-      } else if (type === "바실리스크") {
-        bossMaxHp = 260;
-      } else {
-        bossMaxHp = 300;
+    function showScreen(id){
+      ['opening','charSelect','game','inventory','codePanel','ranking'].forEach(s=>{
+        document.getElementById(s).classList.add('hidden');
+      });
+      document.getElementById(id).classList.remove('hidden');
+    }
+
+    function playBeep(){}
+
+    function startOpening(){
+      const t = document.getElementById('storyText');
+      t.innerText = '너무 세게 돌린다...';
+      setTimeout(()=>{ t.innerText = '바람이 몰아친다...'; }, 1200);
+      setTimeout(()=>{ t.innerText = '📱 새 게임 진입!'; }, 2400);
+      setTimeout(()=>{ t.innerText = '룰렛 정지... → 이세계'; document.body.classList.add('shake'); }, 3600);
+      setTimeout(()=>{ document.body.classList.remove('shake'); t.innerText = '포탈 생성!'; }, 4800);
+      setTimeout(()=>{ t.innerText = '💥 Infinite Abyss Survival'; document.body.classList.add('flash'); }, 6000);
+      setTimeout(()=>{ document.body.classList.remove('flash'); t.innerText = '떨어진다!!!'; }, 7200);
+      setTimeout(()=>{ showScreen('charSelect'); }, 8400);
+    }
+
+    function selectChar(icon,name){
+      charIcon = icon;
+      charName = name;
+      showScreen('game');
+      update();
+      log('🎮 ' + charName + ' 선택!');
+    }
+
+    function rankName(){
+      return ranks[Math.min(ranks.length-1, Math.floor(rankScore / 50))];
+    }
+
+    function levelUpCheck(){
+      while(exp >= maxExp){
+        exp -= maxExp;
+        level++;
+        maxExp = Math.floor(maxExp * 1.5);
+        attackPower += 5;
+        defense += 2;
+        maxHp += 10;
+        hp = maxHp;
+        log('🔥 레벨업! Lv.' + level);
+        log('⚔️ 공격력 증가!');
+        log('🛡️ 방어력 증가!');
+        log('❤️ 최대 체력 증가!');
       }
-      bossHp = bossMaxHp;
-      document.getElementById("bossSprite").innerText =
-        type === "레비아탄" ? "🐋" :
-        type === "바실리스크" ? "🐍" : "🦀";
-      log(`👁️ ${type} 등장!`);
-      updateUI();
     }
 
-    function spawnLeviathan() { resetBoss("레비아탄"); }
-    function spawnBasilisk() { resetBoss("바실리스크"); }
-    function spawnCrabBoss() { resetBoss("게"); }
+    function update(){
+      levelUpCheck();
 
-    function attack() {
-      const dmg = rand(10, 20) + power;
-      bossHp -= dmg;
-      log(`⚔️ 공격! ${dmg} 피해`);
-      afterPlayerAction();
+      document.getElementById('portrait').innerText = charIcon;
+      document.getElementById('charName').innerText = charName;
+      document.getElementById('generationText').innerText = generation;
+      document.getElementById('rankText').innerText = rankName();
+      document.getElementById('levelText').innerText = level;
+      document.getElementById('worldText').innerText = world;
+      document.getElementById('locationText').innerText = currentLocation;
+      document.getElementById('seasonText').innerText = season + ' / ' + timeOfDay;
+      document.getElementById('fruitText').innerText = currentFruit;
+      document.getElementById('famText').innerText = fam;
+      document.getElementById('partyText').innerText = party.length;
+
+      document.getElementById('goldText').innerText = gold;
+      document.getElementById('weaponText').innerText = weaponLevel;
+      document.getElementById('ticketText').innerText = rouletteTicket;
+      document.getElementById('airshipText').innerText = airshipLevel;
+
+      document.getElementById('atkText').innerText = attackPower;
+      document.getElementById('defText').innerText = defense;
+      document.getElementById('maxHpText').innerText = maxHp;
+
+      document.getElementById('hpLabel').innerText = `${Math.max(0, Math.floor(hp))} / ${maxHp}`;
+      document.getElementById('mpLabel').innerText = `${Math.max(0, Math.floor(mp))} / ${maxMp}`;
+      document.getElementById('hungerLabel').innerText = `${Math.max(0, Math.floor(hunger))} / 100`;
+      document.getElementById('thirstLabel').innerText = `${Math.max(0, Math.floor(thirst))} / 100`;
+      document.getElementById('expLabel').innerText = `${Math.floor(exp)} / ${maxExp}`;
+      document.getElementById('bossLabel').innerText = `${Math.max(0, Math.floor(boss))} / ${maxBoss}`;
+
+      document.getElementById('hpBar').style.width = Math.max(0, (hp/maxHp)*100) + '%';
+      document.getElementById('mpBar').style.width = Math.max(0, (mp/maxMp)*100) + '%';
+      document.getElementById('hungerBar').style.width = Math.max(0, hunger) + '%';
+      document.getElementById('thirstBar').style.width = Math.max(0, thirst) + '%';
+      document.getElementById('expBar').style.width = Math.max(0, (exp/maxExp)*100) + '%';
+      document.getElementById('bossBar').style.width = Math.max(0, (boss/maxBoss)*100) + '%';
+
+      document.getElementById('inventoryLog').innerText =
+        `캐릭터: ${charName}
+세대: ${generation}
+랭크: ${rankName()}
+레벨: ${level}
+공격력: ${attackPower}
+방어력: ${defense}
+골드: ${gold}
+무기 레벨: ${weaponLevel}
+룰렛 티켓: ${rouletteTicket}
+사역마: ${fam} (Lv.${familiarLevel})
+파티원: ${party.join(', ') || '없음'}
+비행선 레벨: ${airshipLevel}
+히든 사역마: ${hiddenFamiliars.join(', ') || '없음'}`;
+
+      saveGameNow(true);
     }
 
-    function useSkill() {
-      if (mp < 10) {
-        log("🔷 MP 부족");
+    function explore(){
+      hunger = Math.max(0, hunger - 3);
+      thirst = Math.max(0, thirst - 3);
+      const events = ['몬스터','상자','광석','히든'];
+      const e = events[Math.floor(Math.random()*events.length)];
+      log('🌍 탐험: ' + e);
+      if(e === '상자') openBossChest();
+      if(e === '히든') log('👁️ 수상한 기운이 느껴진다...');
+      update();
+    }
+
+    function attack(){
+      let d = (Math.random()*10 + attackPower) + weaponLevel*5 + familiarLevel*2 + party.length*3;
+      boss -= d;
+      log('⚔️ 공격 ' + Math.floor(d));
+      enemyTurn();
+    }
+
+    function skill(){
+      if(mp < 10){
+        log('❌ MP 부족');
         return;
       }
       mp -= 10;
-      const dmg = power * 3;
-      bossHp -= dmg;
-      log(`💥 스킬 발동! ${dmg} 피해`);
-      afterPlayerAction();
+      let d = Math.random()*40 + attackPower;
+      boss -= d;
+      log('💥 스킬 ' + Math.floor(d));
+      enemyTurn();
     }
 
-    function summonFamiliar() {
-      familiar = familiarList[rand(0, familiarList.length - 1)];
-      log(`👾 사역마 소환: ${familiar}`);
-      updateUI();
-    }
-
-    function bossCounter() {
-      const dmg = rand(10, 18);
-      hp -= dmg;
-      log(`${document.getElementById("bossSprite").innerText} 반격! ${dmg} 피해`);
-      if (hp <= 0) {
-        hp = 0;
-        updateUI();
-        alert("게임 오버");
-        location.reload();
-      }
-    }
-
-    function afterPlayerAction() {
-      if (bossHp <= 0) {
-        bossHp = 0;
-        let reward = 5;
-        if (currentBoss === "게" && season === "겨울") reward = 20;
-        if (currentBoss === "레비아탄") reward = 8;
-        if (currentBoss === "바실리스크") reward = 12;
-        coins += reward;
-        log(`🏆 ${currentBoss} 처치! 코인 +${reward}`);
-        resetBoss(currentBoss);
+    function dodge(){
+      if(Math.random() < 0.5){
+        log('💨 회피 성공!');
       } else {
-        bossCounter();
+        hp -= 10;
+        log('💀 회피 실패!');
+        deathCheck();
       }
-      updateUI();
+      update();
     }
 
-    function openInventory() {
-      document.getElementById("inventoryLog").innerText =
-        `현재 전투력: ${power}\n강화석: ${stones}\n봉인석: ${seals}\n소환석: ${summons}`;
-      showScreen("inventory");
+    function usePotion(){
+      hp = Math.min(maxHp, hp + 30);
+      log('🧪 체력 회복!');
+      update();
     }
 
-    function upgradeWeapon() {
-      if (stones <= 0) {
-        document.getElementById("inventoryLog").innerText += "\n강화석 부족";
+    function enemyTurn(){
+      let d = Math.random()*15 - defense;
+      if(d < 1) d = 1;
+
+      if(winterEventActive){
+        d += 8;
+      }
+      if(ultraMode){
+        d += ultraMode * 4;
+      }
+      if(basiliskMode){
+        d += 12;
+      }
+
+      hp -= d;
+      log('👹 공격 ' + Math.floor(d));
+
+      if(basiliskMode){
+        if(boss < 1100 && phase === 1 && basiliskForm === 0){
+          basiliskForm = 1;
+          phase = 2;
+          currentBossName = basiliskForms[1].name;
+          maxBoss = basiliskForms[1].hp;
+          boss = Math.max(boss, 900);
+          document.getElementById('bossSprite').innerText = basiliskForms[1].icon;
+          log('🐍 바실리스크 2형태 변신!');
+        }
+        if(boss < 500 && phase === 2 && basiliskForm === 1){
+          basiliskForm = 2;
+          phase = 3;
+          currentBossName = basiliskForms[2].name;
+          maxBoss = basiliskForms[2].hp;
+          boss = Math.max(boss, 700);
+          document.getElementById('bossSprite').innerText = basiliskForms[2].icon;
+          log('🐍 거대 3D 뱀 바실리스크 변신!');
+        }
+        if(boss <= 0){
+          log('❌ 바실리스크는 포획 불가. 차원 너머로 사라진다!');
+          basiliskMode = false;
+          currentBossName = '일반 적';
+          maxBoss = 100;
+          boss = 100;
+          document.getElementById('bossSprite').innerText = '👹';
+        }
+      } else if(winterEventActive){
+        if(phase === 1 && boss < maxBoss*0.6){
+          phase = 2;
+          log('🌀 Domi Reversi 강화!');
+          hp -= 12;
+        }
+        if(phase === 2 && boss < maxBoss*0.25){
+          phase = 3;
+          log(winterGuardianTurn === 1 ? '👑 로키 거대화!' : '🔥 루피 자유 폭주!');
+          hp -= 18;
+        }
+        if(boss <= 0){
+          log(`🏆 ${currentBossName} 격파!!!`);
+          if(!devilFruitClaimed){
+            const fruits = winterGuardianTurn === 1
+              ? ['방패 열매','거인 열매','철벽 열매']
+              : ['화염 열매','번개 열매','가속 열매'];
+            currentFruit = fruits[Math.floor(Math.random()*fruits.length)];
+            devilFruitClaimed = true;
+            log('🍎 악마의 열매 획득! ' + currentFruit);
+          } else {
+            log('🍎 이번 겨울엔 이미 열매를 얻었다');
+          }
+          winterEventActive = false;
+          rankScore += 220;
+          exp += 120;
+          maxBoss = 100;
+          boss = 100;
+          currentBossName = '일반 적';
+          document.getElementById('bossSprite').innerText = '👹';
+        }
+      } else if(ultraMode){
+        if(boss <= 0){
+          log(`🏆 ${currentBossName} 격파!!!`);
+          defeatedBosses.add(currentBossName);
+          rankScore += 300 + ultraMode*120;
+          exp += 150 + ultraMode*40;
+          if(defeatedBosses.size === 5){
+            log('🌀 모든 초월 보스 처치! 세계 이동 가능!');
+          }
+          boss = maxBoss;
+        }
+      } else {
+        if(boss <= 0){
+          let gained = Math.floor(30 + Math.random()*20);
+          exp += gained;
+          rankScore += 30;
+          log('🏆 보스 처치! 경험치 +' + gained);
+          boss = maxBoss;
+        }
+      }
+
+      deathCheck();
+      update();
+    }
+
+    function deathCheck(){
+      if(hp <= 0){
+        log('💀 사망 → 후손 계승');
+        generation++;
+        legacyBonus += 10;
+        hp = maxHp;
+        rankScore += legacyBonus;
+        log('🧬 후손 각성! 보너스 +' + legacyBonus);
+      }
+    }
+
+    function spawnBoss(){
+      finalMode = false;
+      ultraMode = 0;
+      basiliskMode = false;
+      winterEventActive = false;
+      currentBossName = '강한 보스';
+      maxBoss = 200;
+      boss = 200;
+      document.getElementById('bossSprite').innerText = '👑';
+      log('👑 강한 보스 등장!');
+      update();
+    }
+
+    function spawnFinal(){
+      finalMode = true;
+      ultraMode = 0;
+      basiliskMode = false;
+      winterEventActive = false;
+      currentBossName = '아비스 게';
+      maxBoss = 500;
+      boss = 500;
+      phase = 1;
+      document.getElementById('bossSprite').innerText = '🦀';
+      log('👑 최강종 등장: 아비스 게');
+      update();
+    }
+
+    function spawnUltraBoss(id){
+      finalMode = false;
+      ultraMode = id;
+      basiliskMode = false;
+      winterEventActive = false;
+      currentBossName = ultraBosses[id].name;
+      maxBoss = ultraBosses[id].hp;
+      boss = maxBoss;
+      phase = 1;
+      document.getElementById('bossSprite').innerText = ultraBosses[id].icon;
+      log(`${ultraBosses[id].icon} ${currentBossName} 등장!!!`);
+      update();
+    }
+
+    function spawnBasilisk(){
+      finalMode = false;
+      ultraMode = 0;
+      basiliskMode = true;
+      winterEventActive = false;
+      basiliskForm = 0;
+      currentBossName = basiliskForms[0].name;
+      maxBoss = basiliskForms[0].hp;
+      boss = maxBoss;
+      phase = 1;
+      document.getElementById('bossSprite').innerText = basiliskForms[0].icon;
+      log('🐍 바실리스크 출현! 포획 불가');
+      update();
+    }
+
+    function shiftBasilisk(){
+      if(!basiliskMode){
+        log('❌ 바실리스크가 없음');
         return;
       }
-      stones--;
-      power += 3;
-      document.getElementById("inventoryLog").innerText += `\n🔥 강화 성공! 전투력 ${power}`;
-      updateUI();
+      world = world === '이세계' ? '현실세계' : '이세계';
+      hp -= 8;
+      log('🌀 바실리스크가 세계를 넘나든다! ' + world);
+      update();
     }
 
-    function craftSeal() {
-      if (stones < 1) {
-        document.getElementById("inventoryLog").innerText += "\n재료 부족";
+    function startWinterEvent(){
+      season = '겨울';
+      timeOfDay = Math.random() < 0.7 ? '밤' : '낮';
+      winterEventActive = true;
+      finalMode = false;
+      ultraMode = 0;
+      basiliskMode = false;
+      phase = 1;
+      winterGuardianTurn = (winterGuardianTurn % 2) + 1;
+
+      if(winterGuardianTurn === 1){
+        currentBossName = '엘바프 수호자 로키';
+        maxBoss = 1400;
+        boss = 1400;
+        document.getElementById('bossSprite').innerText = '👑';
+        log('❄️ 엘바프 겨울섬 진입!');
+        log('🌀 Domi Reversi 발동!');
+        log('👑 로키 등장!');
+      } else {
+        currentBossName = '엘바프 수호자 루피';
+        maxBoss = 1200;
+        boss = 1200;
+        document.getElementById('bossSprite').innerText = '🔥';
+        log('❄️ 엘바프 겨울섬 진입!');
+        log('🌀 Domi Reversi 발동!');
+        log('🔥 루피 등장!');
+      }
+      update();
+    }
+
+    function toggleWorld(){
+      if(defeatedBosses.size < 5){
+        log('❌ 아직 모든 초월 보스를 처치하지 못함');
         return;
       }
-      stones--;
-      seals++;
-      document.getElementById("inventoryLog").innerText += "\n🔒 봉인 제작 완료";
-      updateUI();
+      world = world === '이세계' ? '현실세계' : '이세계';
+      log('🌀 ' + world + '로 이동!');
+      update();
     }
 
-    function craftSummon() {
-      if (stones < 1) {
-        document.getElementById("inventoryLog").innerText += "\n재료 부족";
+    function roulette(){
+      if(rouletteTicket <= 0){
+        log('❌ 티켓 없음');
         return;
       }
-      stones--;
-      summons++;
-      document.getElementById("inventoryLog").innerText += "\n✨ 소환 제작 완료";
-      updateUI();
+      rouletteTicket--;
+
+      const rewards = ['gold','weapon','heal','jackpot','pet','legend'];
+      const r = rewards[Math.floor(Math.random()*rewards.length)];
+
+      if(r === 'gold'){ gold += 50; log('💰 골드 +50'); }
+      if(r === 'weapon'){ weaponLevel++; log('⚔️ 무기 강화!'); }
+      if(r === 'heal'){ hp = maxHp; log('🧪 풀회복!'); }
+      if(r === 'jackpot'){ gold += 200; log('💎 대박!'); }
+      if(r === 'pet'){ fam = '랜덤 사역마'; log('👾 사역마 획득!'); }
+      if(r === 'legend'){ weaponLevel += 3; log('💎 전설 아이템 획득!'); }
+
+      update();
     }
 
-    function openDex() { showScreen("dex"); }
-    function openShop() { showScreen("shop"); }
-    function openChest() { showScreen("chest"); }
-    function openRoulette() { showScreen("roulette"); }
+    function openShop(){
+      let text = '🛒 상점\\n보유 골드: ' + gold + '\\n\\n';
+      shopItems.forEach((item,i)=> text += i + ': ' + item.name + ' (' + item.price + 'G)\\n');
+      let c = prompt(text + '\\n번호 입력');
+      let item = shopItems[c];
+      if(!item) return;
 
-    function buyMode(name, price) {
-      if (coins < price) {
-        alert("코인이 부족해");
+      if(gold < item.price){
+        log('❌ 골드 부족');
         return;
       }
-      coins -= price;
-      log(`🛒 ${name} 모드 구매 완료`);
-      updateUI();
+
+      gold -= item.price;
+
+      if(item.type === 'heal'){ hp = Math.min(maxHp, hp + 30); log('🧪 체력 회복!'); }
+      if(item.type === 'food'){ hunger = 100; thirst = 100; log('🍖 음식 섭취!'); }
+      if(item.type === 'weapon'){ weaponLevel++; log('⚔️ 무기 강화!'); }
+      if(item.type === 'pet'){ fam = '랜덤 사역마'; log('👾 사역마 획득!'); }
+      if(item.type === 'airship'){ airshipLevel++; log('🛩️ 비행선 부품 구매!'); }
+      if(item.type === 'ticket'){ rouletteTicket++; log('🎰 티켓 +1'); }
+      if(item.type === 'party'){ recruitMember(); }
+      if(item.type === 'fup'){ upgradeFamiliar(); }
+
+      update();
     }
 
-    function openOneChest() {
-      const rewards = ["소환석", "봉인석", "강화석", "히든 힌트"];
-      const pick = rewards[rand(0, rewards.length - 1)];
-      const el = document.getElementById("chestLog");
+    function openBossChest(){
+      let r = Math.random();
 
-      if (pick === "소환석") summons++;
-      if (pick === "봉인석") seals++;
-      if (pick === "강화석") stones++;
-      if (pick === "히든 힌트") hiddenHintFound = true;
+      if(r < 0.35){
+        const reward = ['전설 재료','강화석','열쇠 조각'][Math.floor(Math.random()*3)];
+        log('👑 보스 상자 보상: ' + reward);
+      } else if(r < 0.7){
+        let code = 'CODE-' + Math.floor(1000 + Math.random()*9000);
+        bossChestCodes.push(code);
+        log('👑 보스 상자 코드 획득: ' + code);
+      } else {
+        const clues = [
+          {code:'ELBAF777', reward:'히든 사역마: 설원 정령'},
+          {code:'DOMI999', reward:'히든 사역마: 리버시 악령'},
+          {code:'AIR3141', reward:'보상: 비행선 핵심'}
+        ];
+        const clue = clues[Math.floor(Math.random()*clues.length)];
+        hiddenClues.push(clue);
+        log('👑 히든 단서 발견! 코드가 적혀 있다...');
+      }
 
-      el.innerText += "\n📦 상자 결과: " + pick;
-      updateUI();
+      document.getElementById('codeHintLog').innerText =
+        '일반 코드: ' + (bossChestCodes.join(', ') || '없음') +
+        '\n히든 단서 개수: ' + hiddenClues.length;
     }
 
-    function rollFamiliarRoulette() {
-      const list = ["드래곤","악마","정령","고릴라","도롱용","슬라임","유령"];
-      const pick = list[rand(0, list.length - 1)];
-      familiar = pick;
-      document.getElementById("rouletteLog").innerText += "\n🎡 룰렛 결과: " + pick;
-      updateUI();
-    }
-
-    function openSavePrompt() {
-      const pw = prompt("저장 비밀번호 입력");
-      if (pw !== SAVE_PASSWORD) {
-        alert("비밀번호가 틀렸어");
+    function redeemCode(input){
+      input = (input || '').trim().toUpperCase();
+      if(!input){
+        document.getElementById('codeHintLog').innerText = '코드를 입력해.';
         return;
       }
-      loadGame();
-    }
 
-    function saveGame() {
-      const pw = prompt("저장 비밀번호 입력");
-      if (pw !== SAVE_PASSWORD) {
-        alert("비밀번호가 틀렸어");
+      let hidden = hiddenClues.find(c=>c.code === input);
+      if(hidden){
+        if(hidden.reward.includes('히든 사역마')){
+          fam = hidden.reward.split(': ')[1];
+          hiddenFamiliars.push(fam);
+          log('👾 히든 사역마 해금! ' + fam);
+        } else {
+          airshipLevel++;
+          log('🎁 특수 보상 획득! 비행선 핵심');
+        }
+        document.getElementById('codeHintLog').innerText = '성공! ' + hidden.reward;
+        update();
         return;
       }
+
+      if(bossChestCodes.includes(input)){
+        gold += 50;
+        rankScore += 30;
+        log('🎁 일반 코드 보상 획득!');
+        document.getElementById('codeHintLog').innerText = '일반 코드 보상 지급 완료';
+      } else {
+        document.getElementById('codeHintLog').innerText = '없는 코드야.';
+      }
+      update();
+    }
+
+    function nightTreasure(){
+      if(!(season === '겨울' && timeOfDay === '밤' && winterEventActive)){
+        log('🌙 겨울 엘바프 밤에만 가능');
+        return;
+      }
+
+      if(Math.random() < 0.2){
+        const finds = ['얼음 보물지도','거인 금화','숨겨진 열매 흔적','비행선 설계 조각'];
+        const find = finds[Math.floor(Math.random()*finds.length)];
+        log('🌙 보물찾기 성공! ' + find);
+        if(find.includes('비행선')) airshipLevel++;
+      } else {
+        log('🌙 눈보라 때문에 아무것도 못 찾았다');
+      }
+      update();
+    }
+
+    function upgradeAirship(){
+      airshipLevel++;
+      log('🛩️ 비행선 레벨 증가: ' + airshipLevel);
+      if(airshipLevel >= 3){
+        log('☁️ 장거리 비행 가능!');
+      }
+      update();
+    }
+
+    function flyAirship(){
+      if(airshipLevel < 1){
+        log('❌ 비행선 없음');
+        return;
+      }
+
+      let text = '🛩️ 이동할 지역 선택\\n';
+      locations.forEach((l,i)=> text += i + ': ' + l + '\\n');
+      let choice = prompt(text);
+      let loc = locations[choice];
+      if(!loc) return;
+
+      currentLocation = loc;
+      log('🛩️ ' + loc + ' 이동!');
+      update();
+    }
+
+    function summonFam(){
+      let list = ['드래곤','정령','악마','천사'];
+      fam = list[Math.floor(Math.random()*list.length)];
+      log('👾 ' + fam + ' 소환!');
+      update();
+    }
+
+    function upgradeFamiliar(){
+      if(!fam || fam === '없음'){
+        log('❌ 사역마 없음');
+        return;
+      }
+      familiarLevel++;
+      log('👾 사역마 강화! Lv.' + familiarLevel);
+      update();
+    }
+
+    function evolveFamiliar(){
+      if(familiarLevel < 3){
+        log('❌ 레벨 부족');
+        return;
+      }
+      fam = '🌟 진화 사역마';
+      log('✨ 사역마 진화!');
+      update();
+    }
+
+    function recruitMember(){
+      let members = ['⚔️ 검사','🏹 궁수','🧙 마법사','🛡️ 탱커'];
+      let m = members[Math.floor(Math.random()*members.length)];
+      party.push(m);
+      log('👥 파티원 영입: ' + m);
+      update();
+    }
+
+    function openGuild(){
+      log('🏰 길드 입장');
+      let rewards = ['코인','아이템','사역마'];
+      let r = rewards[Math.floor(Math.random()*rewards.length)];
+      log('📜 퀘스트 완료: ' + r + ' 획득!');
+      gold += 30;
+      rankScore += 20;
+      update();
+    }
+
+    function coopMode(){
+      let d = Math.random()*50;
+      boss -= d;
+      log('🤝 협동 공격! ' + Math.floor(d));
+      enemyTurn();
+    }
+
+    function toggleCallUi(){
+      document.getElementById('callUi').classList.toggle('hidden');
+    }
+
+    function connectFriend(){
+      let name = callNames[Math.floor(Math.random()*callNames.length)];
+      let face = callFaces[Math.floor(Math.random()*callFaces.length)];
+      document.getElementById('friendName').innerText = name;
+      document.getElementById('videoFace').innerText = face;
+      document.getElementById('callStatus').innerText = '영상통화 느낌 연결됨';
+      document.getElementById('netStatus').innerText = '● 연결 안정적';
+      document.getElementById('callUi').classList.remove('hidden');
+      log('📞 ' + name + ' 연결됨');
+    }
+
+    function toggleMic(){
+      micOn = !micOn;
+      document.getElementById('callStatus').innerText = micOn ? '마이크 켜짐' : '마이크 음소거';
+      log(micOn ? '🎤 마이크 켜짐' : '🔇 마이크 음소거');
+    }
+
+    function endCall(){
+      document.getElementById('friendName').innerText = '친구 대기중';
+      document.getElementById('videoFace').innerText = '🙂';
+      document.getElementById('callStatus').innerText = '통화 종료';
+      document.getElementById('netStatus').innerText = '● 대기';
+      log('📴 통화 종료');
+    }
+
+    function saveGameNow(silent=false){
       const data = {
-        hp, maxHp, mp, maxMp,
-        bossHp, bossMaxHp, currentBoss,
-        coins, power, stones, seals, summons,
-        familiar, season, role, hiddenHintFound
+        charIcon, charName, hp, maxHp, mp, maxMp, hunger, thirst,
+        boss, maxBoss, currentBossName, gold, weaponLevel, rouletteTicket,
+        fam, familiarLevel, party, airshipLevel, currentLocation,
+        level, exp, maxExp, attackPower, defense,
+        rankScore, generation, legacyBonus, world,
+        season, timeOfDay, winterEventActive, winterGuardianTurn,
+        devilFruitClaimed, currentFruit,
+        finalMode, ultraMode, basiliskMode, basiliskForm, phase,
+        bossChestCodes, hiddenClues, hiddenFamiliars,
+        defeatedBosses: Array.from(defeatedBosses)
       };
-      localStorage.setItem("rouletteDungeonSave", JSON.stringify(data));
-      alert("저장 완료");
+      localStorage.setItem('infiniteAbyssFinalSave', JSON.stringify(data));
+      if(!silent) log('💾 저장 완료');
     }
 
-    function loadGame() {
-      const raw = localStorage.getItem("rouletteDungeonSave");
-      if (!raw) {
-        alert("저장 데이터가 없어");
-        return;
+    function loadGame(){
+      try {
+        const raw = localStorage.getItem('infiniteAbyssFinalSave');
+        if(!raw) return;
+        const d = JSON.parse(raw);
+
+        charIcon = d.charIcon ?? charIcon;
+        charName = d.charName ?? charName;
+        hp = d.hp ?? hp;
+        maxHp = d.maxHp ?? maxHp;
+        mp = d.mp ?? mp;
+        maxMp = d.maxMp ?? maxMp;
+        hunger = d.hunger ?? hunger;
+        thirst = d.thirst ?? thirst;
+        boss = d.boss ?? boss;
+        maxBoss = d.maxBoss ?? maxBoss;
+        currentBossName = d.currentBossName ?? currentBossName;
+        gold = d.gold ?? gold;
+        weaponLevel = d.weaponLevel ?? weaponLevel;
+        rouletteTicket = d.rouletteTicket ?? rouletteTicket;
+        fam = d.fam ?? fam;
+        familiarLevel = d.familiarLevel ?? familiarLevel;
+        party = d.party ?? party;
+        airshipLevel = d.airshipLevel ?? airshipLevel;
+        currentLocation = d.currentLocation ?? currentLocation;
+        level = d.level ?? level;
+        exp = d.exp ?? exp;
+        maxExp = d.maxExp ?? maxExp;
+        attackPower = d.attackPower ?? attackPower;
+        defense = d.defense ?? defense;
+        rankScore = d.rankScore ?? rankScore;
+        generation = d.generation ?? generation;
+        legacyBonus = d.legacyBonus ?? legacyBonus;
+        world = d.world ?? world;
+        season = d.season ?? season;
+        timeOfDay = d.timeOfDay ?? timeOfDay;
+        winterEventActive = d.winterEventActive ?? winterEventActive;
+        winterGuardianTurn = d.winterGuardianTurn ?? winterGuardianTurn;
+        devilFruitClaimed = d.devilFruitClaimed ?? devilFruitClaimed;
+        currentFruit = d.currentFruit ?? currentFruit;
+        finalMode = d.finalMode ?? finalMode;
+        ultraMode = d.ultraMode ?? ultraMode;
+        basiliskMode = d.basiliskMode ?? basiliskMode;
+        basiliskForm = d.basiliskForm ?? basiliskForm;
+        phase = d.phase ?? phase;
+        bossChestCodes = d.bossChestCodes ?? bossChestCodes;
+        hiddenClues = d.hiddenClues ?? hiddenClues;
+        hiddenFamiliars = d.hiddenFamiliars ?? hiddenFamiliars;
+
+        if(Array.isArray(d.defeatedBosses)){
+          d.defeatedBosses.forEach(x=>defeatedBosses.add(x));
+        }
+      } catch(e) {}
+    }
+
+    // 자동 저장
+    setInterval(()=>{
+      hunger = Math.max(0, hunger - 1);
+      thirst = Math.max(0, thirst - 1);
+      if(hunger <= 0 || thirst <= 0){
+        hp -= 2;
+        deathCheck();
       }
-      const d = JSON.parse(raw);
-      hp = d.hp; maxHp = d.maxHp;
-      mp = d.mp; maxMp = d.maxMp;
-      bossHp = d.bossHp; bossMaxHp = d.bossMaxHp; currentBoss = d.currentBoss;
-      coins = d.coins; power = d.power;
-      stones = d.stones; seals = d.seals; summons = d.summons;
-      familiar = d.familiar; season = d.season; role = d.role;
-      hiddenHintFound = d.hiddenHintFound;
-      document.getElementById("bossSprite").innerText =
-        currentBoss === "레비아탄" ? "🐋" :
-        currentBoss === "바실리스크" ? "🐍" : "🦀";
-      showScreen("game");
-      updateUI();
-      log("💾 저장 불러오기 완료");
-    }
+      saveGameNow(true);
+      update();
+    }, 4000);
 
-    function rand(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-    // 조이스틱
-    const joystick = document.getElementById("joystick");
-    const stick = document.getElementById("stick");
-    const player = document.getElementById("player");
-    let dragging = false;
-
-    joystick.addEventListener("pointerdown", () => dragging = true);
-    window.addEventListener("pointerup", () => {
-      dragging = false;
-      stick.style.left = "40px";
-      stick.style.top = "40px";
-    });
-
-    joystick.addEventListener("pointermove", (e) => {
-      if (!dragging) return;
-      const rect = joystick.getBoundingClientRect();
-      let x = e.clientX - rect.left - 20;
-      let y = e.clientY - rect.top - 20;
-      x = Math.max(10, Math.min(70, x));
-      y = Math.max(10, Math.min(70, y));
-      stick.style.left = x + "px";
-      stick.style.top = y + "px";
-
-      const area = document.getElementById("gameArea").getBoundingClientRect();
-      const px = parseFloat(player.style.left || 140);
-      const py = parseFloat(player.style.top || 140);
-
-      let dx = (x - 40) / 12;
-      let dy = (y - 40) / 12;
-
-      let nx = Math.max(0, Math.min(area.width - 42, px + dx));
-      let ny = Math.max(0, Math.min(area.height - 42, py + dy));
-
-      player.style.left = nx + "px";
-      player.style.top = ny + "px";
-    });
-
-    // 시작값
-    resetBoss("게");
-    updateUI();
-    log("🎮 준비 완료");
+    loadGame();
+    update();
   </script>
 </body>
-</html>
+  </html>
